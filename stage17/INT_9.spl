@@ -37,15 +37,31 @@ userAreaPage = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11];
 SP = userAreaPage*512-1; //initializing stack of the new process
 
 [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 4] = RUNNING;
-[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 7] = inodeTracker;
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 7] = inodeTracker; //storing inodeindex obtained above in the inode field of process-table 
 
 //no-need to allocate library pages for new process because we did not deallocate them?
 //get free page function
-multipush(R0,R1,R2,R3);
-R1 = 1;
-call MOD_2; //this should allocate two stack and two heap pages
-multipop(R0,R1,R2,R3);
+alias flag R3;
+flag = 0;
+while(flag<4) do
+	multipush(R0,R1,R2,R3);
+	R1 = 1;
+	call MOD_2; //this should allocate two stack and two heap pages
+	multipop(R0,R1,R2,R3);
+	flag = flag + 1;
 //validate corresponding entries in page table??
+endwhile;
 
 
+flag = 6;
+while(flag<9) do 
+	if([INODE_TABLE + 16*inodeTracker + flag]!=-1) then		
+		multipush(R0,R1,R2,R3);
+		R1 = 1;
+		call MOD_2; //this should allocate two stack and two heap pages
+		multipop(R0,R1,R2,R3);
+	endif;
+	flag = flag + 1;
+endwhile;
+//update the PAGE TABLE ENTRIES???
 

@@ -6,7 +6,6 @@ loadi(41,54); // loading mod 0 - terminal handling
 loadi(48,61);
 loadi(49,62); // loading mod 4 - device manager
 
-
 loadi(4,17);
 loadi(5,18); //for timer interrupt handler
 
@@ -35,6 +34,15 @@ loadi(9,22); // Console-Interrupt routine
 
 loadi(14,27);
 loadi(15,28); //Interrupt 6 
+
+loadi(20,33);
+loadi(21,34); // Interrupt 9
+
+loadi(40,55);
+loadi(41,56); // Loading MOD 1 - Process Manager
+
+loadi(44,57);
+loadi(45,58); // Loading MOD_2 - Memory Manager
 
 // INIT - CODE
 
@@ -90,8 +98,18 @@ while(counter <16) do
 endwhile;
 
 [TERMINAL_STATUS_TABLE] = 0;
+
+alias counter1 R0;
+counter1 = 0;
+while(counter1 <81) do
+	[MEMORY_FREE_LIST + counter1] = 1; //used by Kernel Process
+	counter1 = counter1 + 1;
+endwhile;
+while(counter1 <128) do 
+	[MEMORY_FREE_LIST + counter1] = 0; //free memory pages
+	counter1 = counter1 + 1;
+endwhile;
+
+[SYSTEM_STATUS_TABLE + 3] = 0;
+[SYSTEM_STATUS_TABLE + 2] = 47;
 return;	
-
-
-
-

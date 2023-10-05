@@ -38,8 +38,8 @@ loadi(15,28); //Interrupt 6
 loadi(20,33);
 loadi(21,34); // Interrupt 9
 
-loadi(40,55);
-loadi(41,56); // Loading MOD 1 - Process Manager
+loadi(42,55);
+loadi(43,56); // Loading MOD 1 - Process Manager
 
 loadi(44,57);
 loadi(45,58); // Loading MOD_2 - Memory Manager

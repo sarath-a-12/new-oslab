@@ -6,7 +6,7 @@ SP = [PROCESS_TABLE + ([SYSTEM_STATUS_TABLE + 1] * 16) + 11] * 512 - 1;
 
 [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9]  = 9; //mode is set to 9
 alias fileName R1;
-fileName = [[PTBR + (userSP/512)*2]*512 + (userSP%512)];
+fileName = [[PTBR + ((userSP-4)/512)*2]*512 + ((userSP-4)%512)];
 alias inodeTracker R2;
 inodeTracker = 0;
 alias flag R3;
@@ -24,6 +24,7 @@ if(flag==0) then
 	SP = userSP;	
 	ireturn;
 endif;
+breakpoint; 
 //Do not use inodeTracker/R2 for anything else
 //Exit process function call
 multipush(R0,R1,R2,R3);

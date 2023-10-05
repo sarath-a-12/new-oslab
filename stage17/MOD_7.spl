@@ -26,6 +26,9 @@ loadi(17,30);// INT - 7 loader
 
 //loadi(83,69); //Evennumbers loading
 
+loadi(59,3);
+loadi(60,4); //Inode table loading
+
 loadi(50,63); // Loading module 5 - scheduler
 loadi(51,64);
 
@@ -101,7 +104,7 @@ endwhile;
 
 alias counter1 R0;
 counter1 = 0;
-while(counter1 <81) do
+while(counter1 <83) do
 	[MEMORY_FREE_LIST + counter1] = 1; //used by Kernel Process
 	counter1 = counter1 + 1;
 endwhile;
@@ -111,5 +114,5 @@ while(counter1 <128) do
 endwhile;
 
 [SYSTEM_STATUS_TABLE + 3] = 0;
-[SYSTEM_STATUS_TABLE + 2] = 47;
+[SYSTEM_STATUS_TABLE + 2] = 45;
 return;	

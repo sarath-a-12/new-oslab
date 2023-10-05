@@ -10,7 +10,7 @@ if(functionNum == 1) then
 	[SYSTEM_STATUS_TABLE + 2] = [SYSTEM_STATUS_TABLE + 2] - 1;
 	[SYSTEM_STATUS_TABLE + 3] = [SYSTEM_STATUS_TABLE + 3] - 1; 
 	alias counter R2;
-	counter = 76;
+	counter = 83;
 	while(counter<129) do 
 		if([MEMORY_FREE_LIST + counter] == 0) then
 			[MEMORY_FREE_LIST + counter] = 1;

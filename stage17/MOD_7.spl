@@ -102,15 +102,14 @@ endwhile;
 
 [TERMINAL_STATUS_TABLE] = 0;
 
-alias counter1 R0;
-counter1 = 0;
-while(counter1 <83) do
-	[MEMORY_FREE_LIST + counter1] = 1; //used by Kernel Process
-	counter1 = counter1 + 1;
+counter = 0;
+while(counter <83) do
+	[MEMORY_FREE_LIST + counter] = 1; //used by Kernel Process or other processes
+	counter = counter + 1;
 endwhile;
-while(counter1 <128) do 
-	[MEMORY_FREE_LIST + counter1] = 0; //free memory pages
-	counter1 = counter1 + 1;
+while(counter <128) do 
+	[MEMORY_FREE_LIST + counter] = 0; //free memory pages
+	counter = counter + 1;
 endwhile;
 
 [SYSTEM_STATUS_TABLE + 3] = 0;

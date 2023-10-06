@@ -1,0 +1,14 @@
+decl
+int temp;
+string a;
+enddecl
+int main(){
+	begin
+	temp = exposcall("Read",-1,a);
+	temp = exposcall("Exec",a);
+	if(temp == -1) then
+		temp = exposcall("Write", -2, "INVALID");
+	endif;
+	return 0;
+	end
+}

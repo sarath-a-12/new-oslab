@@ -9,16 +9,16 @@ alias fileName R1;
 fileName = [[PTBR + ((userSP-4)/512)*2]*512 + ((userSP-4)%512)];
 alias inodeTracker R2;
 inodeTracker = 0;
-alias flag R3;
-flag = 0;
+alias ctr R3;
+ctr = 0;
 while(inodeTracker<60) do //60 is MAX_FILE_NUM
 	if([INODE_TABLE + 16*inodeTracker + 1]==fileName && [INODE_TABLE + 16*inodeTracker] == EXEC) then
-		flag = 1;
+		ctr = 1;
 		break;
 	endif;
 	inodeTracker = inodeTracker + 1;
 endwhile;
-if(flag==0) then
+if(ctr==0) then
 	[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9]  = 0; //mode is set to 0 for resuming user process
 	[[PTBR+((userSP-1)/512)*2]*512 + (userSP-1)%512] = -1; //return value -1 for failure
 	SP = userSP;	
@@ -34,7 +34,7 @@ multipop(R0,R1,R2,R3);
 alias userAreaPage R3;
 userAreaPage = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11];
 [MEMORY_FREE_LIST + userAreaPage] = [MEMORY_FREE_LIST + userAreaPage] + 1;
-[SYSTEM_STATUS_TABLE + 2] =[SYSTEM_STATUS_TABLE + 2] - 1; //decrementing MEM_FREE_COUNT
+[SYSTEM_STATUS_TABLE + 2] =[SYSTEM_STATUS_TABLE + 2] - 1; //dectrementing MEM_FREE_COUNT
 SP = userAreaPage*512-1; //initializing stack of the new process
 
 [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 4] = RUNNING;
@@ -48,51 +48,59 @@ SP = userAreaPage*512-1; //initializing stack of the new process
 
 
 //no-need to allocate library pages for new process because we did not deallocate them?
-alias flag R3;
-flag = 0;
-while(flag<4) do  //to allocate 2 stacks and 2 heaps
+alias ctr R3;
+ctr = 2;
+while(ctr<4) do  //to allocate 2 stacks and 2 heaps
 	multipush(R0,R1,R2,R3);
 	R1 = 1;
 	call MOD_2; 
-	if(flag<2) then
-		[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 + ( flag*2 + 4 )] = R0;
-		[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]*20 + ( flag*2 + 5)] = "0110"; // for heap pages 
-	endif;
-	if(flag>1) then
-		[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 + ( flag*2 + 12)] = R0;
-		[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 + ( flag*2 + 13 )] = "0110"; //for stack pages
-	endif;
+	[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 + ( ctr*2 + 12)] = R0;
+	[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 + ( ctr*2 + 13 )] = "0110"; //for stack pages
 	multipop(R0,R1,R2,R3);
-	flag = flag + 1;
+	ctr = ctr + 1; // No allocation for heap pages
 endwhile;
+//set page table entries for heap as invalid
+
+[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]*20 + 4 ] = -1;
+[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]*20 + 5 ] = "0000";
+[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]*20 + 6 ] = -1;
+[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]*20 + 7 ] = "0000";
+
 //8,9,10,11
-flag = 8;
-alias cr R4; // another variable because I'm too lazy to calculate
-cr = 0;
-while(flag<11) do // to allocate code pages
-	if([INODE_TABLE + 16*inodeTracker + flag]!=-1) then		
-		multipush(R0,R1,R2,R3,R4);
-		R1 = 1;
-		call MOD_2; 
-		[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 + (cr*2 + 8)] = R0;
-		[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 + (cr*2 + 9)] = "0100";
-		
-		multipop(R0,R1,R2,R3,R4);
-	endif;
-	cr = cr + 1;
-	flag = flag + 1;
+multipush(R0,R1,R2,R3);
+R1 = 5; //Get code Page
+call MOD_2; 
+[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 + (8)] = R0;
+[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 + (9)] = "0100";
+multipop(R0,R1,R2,R3);
+//allocation of one of the code pages is done, rest we shall set to invalid
+
+[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 +10] = -1;
+[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 +11] = "0000";
+[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 +12] = -1;
+[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 +13] = "0000";
+[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 +14] = -1;
+[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 +15] = "0000";
+
+//now initializing the DISK_MAP_TABLE
+ctr = 0;
+while(ctr<10) do
+    [DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + ctr] = -1;
+    ctr = ctr + 1;
 endwhile;
-cr = 0;
-while(cr<4 && [INODE_TABLE + (inodeTracker*16) + 8 + cr]!=-1) do
-	multipush(R1,R2,R3,R4,R5);
-	R1 = DISK_LOAD;
-	R2 = [SYSTEM_STATUS_TABLE + 1];
-	R3 = [PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]*20 + 8 + 2*cr];
-	R4 = [INODE_TABLE + (inodeTracker * 16) + 8 + cr];
-	call MOD_4;
-	multipop(R1,R2,R3,R4,R5);
-	cr = cr + 1;
-endwhile;
+[DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + 4] = [INODE_TABLE + (inodeTracker * 16) + 8];
+[DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + 5] = [INODE_TABLE + (inodeTracker * 16) + 9];
+[DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + 6] = [INODE_TABLE + (inodeTracker * 16) + 10];
+[DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + 7] = [INODE_TABLE + (inodeTracker * 16) + 11];
+
+
+multipush(R1,R2,R3,R4,R5);
+R1 = DISK_LOAD;
+R2 = [SYSTEM_STATUS_TABLE + 1];
+R3 = [PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]*20 + 8 + 2*ctr];
+R4 = [INODE_TABLE + (inodeTracker * 16) + 8 + ctr];
+call MOD_4;
+multipop(R1,R2,R3,R4,R5);
 [[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]*20 + 16 ] * 512] = [[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]*20 + 8]*512 + 1]; //storing entry point value
 SP = 8 * 512;
 [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0; // user mode

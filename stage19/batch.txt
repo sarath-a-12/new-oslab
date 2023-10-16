@@ -1,19 +1,21 @@
 fdisk
-load --os /home/sarath/Documents/sem5_labs/myexpos/stage18/os_startup.xsm
-load --int=timer /home/sarath/Documents/sem5_labs/myexpos/stage18/Timer_Interrupt.xsm
-load --idle /home/sarath/Documents/sem5_labs/myexpos/stage18/idle.xsm
-load --init /home/sarath/Documents/sem5_labs/myexpos/stage18/exec.xsm
-load --module 7 /home/sarath/Documents/sem5_labs/myexpos/stage18/MOD_7.xsm
-load --module 5 /home/sarath/Documents/sem5_labs/myexpos/stage18/MOD_5.xsm
-load --module 4 /home/sarath/Documents/sem5_labs/myexpos/stage18/MOD_4.xsm
-load --module 0 /home/sarath/Documents/sem5_labs/myexpos/stage18/MOD_0.xsm
-load --int=10 /home/sarath/Documents/sem5_labs/myexpos/stage18/INT_10.xsm
+load --os /home/sarath/Documents/sem5_labs/myexpos/stage19/os_startup.xsm
+load --int=timer /home/sarath/Documents/sem5_labs/myexpos/stage19/Timer_Interrupt.xsm
+load --idle /home/sarath/Documents/sem5_labs/myexpos/stage19/idle.xsm
+load --init /home/sarath/Documents/sem5_labs/myexpos/stage19/exec.xsm
+load --module 7 /home/sarath/Documents/sem5_labs/myexpos/stage19/MOD_7.xsm
+load --module 5 /home/sarath/Documents/sem5_labs/myexpos/stage19/MOD_5.xsm
+load --module 4 /home/sarath/Documents/sem5_labs/myexpos/stage19/MOD_4.xsm
+load --module 0 /home/sarath/Documents/sem5_labs/myexpos/stage19/MOD_0.xsm
+load --int=10 /home/sarath/Documents/sem5_labs/myexpos/stage19/INT_10.xsm
 load --library /home/sarath/Documents/myexpos/expl/library.lib
-load --int=7 /home/sarath/Documents/sem5_labs/myexpos/stage18/INT_7.xsm
-load --int=6 /home/sarath/Documents/sem5_labs/myexpos/stage18/INT_6.xsm
-load --int=9 /home/sarath/Documents/sem5_labs/myexpos/stage18/INT_9.xsm
-load --module 1 /home/sarath/Documents/sem5_labs/myexpos/stage18/MOD_1.xsm
-load --module 2 /home/sarath/Documents/sem5_labs/myexpos/stage18/MOD_2.xsm
-load --int=console /home/sarath/Documents/sem5_labs/myexpos/stage18/Console_Interrupt.xsm
-load --exec /home/sarath/Documents/sem5_labs/myexpos/stage18/oddno.xsm
-load --int=disk /home/sarath/Documents/sem5_labs/myexpos/stage18/Disk_Interrupt.xsm
+load --int=7 /home/sarath/Documents/sem5_labs/myexpos/stage19/INT_7.xsm
+load --int=6 /home/sarath/Documents/sem5_labs/myexpos/stage19/INT_6.xsm
+load --int=9 /home/sarath/Documents/sem5_labs/myexpos/stage19/INT_9.xsm
+load --module 1 /home/sarath/Documents/sem5_labs/myexpos/stage19/MOD_1.xsm
+load --module 2 /home/sarath/Documents/sem5_labs/myexpos/stage19/MOD_2.xsm
+load --int=console /home/sarath/Documents/sem5_labs/myexpos/stage19/Console_Interrupt.xsm
+load --exec /home/sarath/Documents/sem5_labs/myexpos/stage19/oddno.xsm
+load --int=disk /home/sarath/Documents/sem5_labs/myexpos/stage19/Disk_Interrupt.xsm
+load --exhandler /home/sarath/Documents/sem5_labs/myexpos/stage19/Exception_Handler.xsm
+load --exec /home/sarath/Documents/sem5_labs/myexpos/stage19/evenno.xsm

@@ -29,7 +29,7 @@ endif;
 multipush(R0,R1,R2,R3);
 R1 = 3;
 R2 = [SYSTEM_STATUS_TABLE + 1];
-call MOD_1;
+call MOD_1; 
 multipop(R0,R1,R2,R3);
 alias userAreaPage R3;
 userAreaPage = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11];
@@ -69,9 +69,11 @@ endwhile;
 //8,9,10,11
 multipush(R0,R1,R2,R3);
 R1 = 5; //Get code Page
+R2 = [INODE_TABLE + inodeTracker*16 + 8];
 call MOD_2; 
 [PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 + (8)] = R0;
 [PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 + (9)] = "0100";
+breakpoint;
 multipop(R0,R1,R2,R3);
 //allocation of one of the code pages is done, rest we shall set to invalid
 
@@ -92,15 +94,6 @@ endwhile;
 [DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + 5] = [INODE_TABLE + (inodeTracker * 16) + 9];
 [DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + 6] = [INODE_TABLE + (inodeTracker * 16) + 10];
 [DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + 7] = [INODE_TABLE + (inodeTracker * 16) + 11];
-
-
-multipush(R1,R2,R3,R4,R5);
-R1 = DISK_LOAD;
-R2 = [SYSTEM_STATUS_TABLE + 1];
-R3 = [PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]*20 + 8 + 2*ctr];
-R4 = [INODE_TABLE + (inodeTracker * 16) + 8 + ctr];
-call MOD_4;
-multipop(R1,R2,R3,R4,R5);
 [[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]*20 + 16 ] * 512] = [[PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]*20 + 8]*512 + 1]; //storing entry point value
 SP = 8 * 512;
 [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0; // user mode

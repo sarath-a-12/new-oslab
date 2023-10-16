@@ -46,13 +46,13 @@ if(functionNumber == FREE_PAGE_TABLE ) then
     alias counter2 R4;
     counter = 2;
     while(counter<10) do 
-        if(counter==2 || counter==3 || counter == 8 || counter ==9) then
+        if(counter==2 || counter==3 || counter == 8 || counter == 9) then
             if([DISK_MAP_TABLE + (R2)*10 + counter]!= -1) then
                 multipush(R0,R1,R2,R3,R4);
                 R1 = 4;
                 R3 = R2;
                 R2 = [DISK_MAP_TABLE + (R3)*10 + counter];
-                call MOD_1; //calling release block
+                call MOD_2; //calling release block
                 multipop(R0,R1,R2,R3,R4);
             endif;
         endif;

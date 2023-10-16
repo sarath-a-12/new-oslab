@@ -21,6 +21,8 @@ loadi(23,36); // int - 10
 loadi(2,15);
 loadi(3,16); //exception handler
 
+loadi(61,2); // loading disk_free_list 
+
 loadi(16,29);
 loadi(17,30);// INT - 7 loader
 
@@ -119,4 +121,14 @@ endwhile;
 [SYSTEM_STATUS_TABLE + 2] = 45; // initialising mem free pages
 
 [DISK_STATUS_TABLE] = 0; //free in the beginning
+
+[DISK_MAP_TABLE + 10 + 2] = 78;
+[DISK_MAP_TABLE + 10 + 3] = 79;
+[DISK_MAP_TABLE + 10 + 4] = 65;
+[DISK_MAP_TABLE + 10 + 5] = 66;
+[DISK_MAP_TABLE + 10 + 6] = -1;
+[DISK_MAP_TABLE + 10 + 7] = -1;
+[DISK_MAP_TABLE + 10 + 8] = 76;
+[DISK_MAP_TABLE + 10 + 9] = 77;
+
 return;	

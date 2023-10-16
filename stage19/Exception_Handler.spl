@@ -1,0 +1,45 @@
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = -1; //EXCEPTION HAS OCCURED!
+backup;
+alias userSP R1;
+userSP = SP;
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 +11] * 512 - 1;
+multipush(EIP);
+if(EC!=0 || SP == 5119) then // if the cause of exception is not page fault or stack pointer is full - done
+    print("Halting!!");
+    multipush(R1);
+    R1 = 3;
+    R2 = [SYSTEM_STATUS_TABLE];
+    call MOD_1;
+    multipop(R1);
+endif;
+alias temp R2;
+if(temp == 4 || temp == 5 || temp == 6 || temp == 7) then //issue due to code page 
+    alias code_block_num R3= [DISK_MAP_TABLE + temp];
+    multipush(R1,R2,R3);
+    R1 = 5;
+    R2 = code_block_num;
+    call MOD_2;
+    multipop(R1,R2,R3);
+    [PTBR + 2*temp] = R0;
+    [PTBR + 2*temp + 1] = "1100";
+endif;
+if(temp == 2 || temp ==3) then
+    alias ctr R3;
+    ctr = 0;
+    while(ctr<2) do 
+        multipush(R1,R2,R3);
+        R1 = 1;
+        call MOD_2;
+        [PTBR + 2*ctr + 4] = R0;
+        [PTBR + 2*ctr +5] = "1110";
+        multipop(R1,R2,R3);
+        ctr = ctr + 1;
+    endwhile;
+endif;
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0; // Resetting the mode
+multipop(EIP);
+restore;
+SP = userSP;
+SP = SP + 1;
+[[PTBR + 2*(SP/512)]*512 + (SP%512)] = EIP;
+ireturn;

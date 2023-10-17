@@ -73,7 +73,6 @@ R2 = [INODE_TABLE + inodeTracker*16 + 8];
 call MOD_2; 
 [PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 + (8)] = R0;
 [PAGE_TABLE_BASE + [SYSTEM_STATUS_TABLE + 1]* 20 + (9)] = "0100";
-breakpoint;
 multipop(R0,R1,R2,R3);
 //allocation of one of the code pages is done, rest we shall set to invalid
 

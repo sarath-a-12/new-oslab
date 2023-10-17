@@ -20,3 +20,4 @@ load --int=disk /home/sarath/Documents/sem5_labs/myexpos/stage19/Disk_Interrupt.
 load --exhandler /home/sarath/Documents/sem5_labs/myexpos/stage19/Exception_Handler.xsm
 load --exec /home/sarath/Documents/sem5_labs/myexpos/stage19/evenno.xsm
 load --exec /home/sarath/Documents/sem5_labs/myexpos/stage19/sll.xsm
+load --exec /home/sarath/Documents/sem5_labs/myexpos/stage19/bs.xsm

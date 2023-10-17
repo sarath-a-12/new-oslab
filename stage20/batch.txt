@@ -10,6 +10,7 @@ load --module 0 /home/sarath/Documents/sem5_labs/myexpos/stage19/MOD_0.xsm
 load --int=10 /home/sarath/Documents/sem5_labs/myexpos/stage19/INT_10.xsm
 load --library /home/sarath/Documents/myexpos/expl/library.lib
 load --int=7 /home/sarath/Documents/sem5_labs/myexpos/stage19/INT_7.xsm
+load --int=8 /home/sarath/Documents/sem5_labs/myexpos/stage19/INT_8.xsm
 load --int=6 /home/sarath/Documents/sem5_labs/myexpos/stage19/INT_6.xsm
 load --int=9 /home/sarath/Documents/sem5_labs/myexpos/stage19/INT_9.xsm
 load --module 1 /home/sarath/Documents/sem5_labs/myexpos/stage19/MOD_1.xsm

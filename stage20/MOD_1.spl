@@ -1,4 +1,23 @@
 alias functionNumber R1;
+if(functionNumber == GET_PCB_ENTRY) then
+    alias ctr R2;
+    while(ctr<16) do
+        if([PROCESS_TABLE + ctr*16 + 4]==TERMINATED) then
+            break;
+        endif;
+        ctr = ctr + 1;
+    endwhile;
+    if(ctr==16) then
+        R0 = -1;
+        return;
+    endif;
+    [PROCESS_TABLE + ctr*16 + 1] = ctr; 
+    [PROCESS_TABLE + ctr*16 + 4] = ALLOCATED;
+    [PROCESS_TABLE + ctr*16 + 14] = PAGE_TABLE_BASE + ctr*20;
+    [PROCESS_TABLE + ctr*16 + 15] = 10;
+    R0 = ctr;
+    return;
+endif;
 if(functionNumber == FREE_USER_AREA_PAGE) then
 	//Free user area page corresponding number -- assume R2 contains the PID
 	multipush(R1,R2);

@@ -26,8 +26,6 @@ loadi(61,2); // loading disk_free_list
 loadi(16,29);
 loadi(17,30);// INT - 7 loader
 
-//loadi(83,69); //Evennumbers loading
-
 loadi(59,3);
 loadi(60,4); //Inode table loading
 
@@ -51,6 +49,9 @@ loadi(45,58); // Loading MOD_2 - Memory Manager
 
 loadi(6,19);
 loadi(7,20); // Loading Disk Interrupt routine
+
+loadi(18,31);
+loadi(19,32); //loading FORK
 
 // INIT - CODE
 
@@ -130,5 +131,6 @@ endwhile;
 [DISK_MAP_TABLE + 10 + 7] = -1;
 [DISK_MAP_TABLE + 10 + 8] = 76;
 [DISK_MAP_TABLE + 10 + 9] = 77;
+
 
 return;	

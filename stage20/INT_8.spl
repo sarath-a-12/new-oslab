@@ -20,7 +20,7 @@ if([PTBR + 4] == -1 || [PTBR + 6] == -1) then
         multipush(R5,R6);
         R1 = 1;
         call MOD_2;
-        multipop(R2,R5);
+        multipop(R5,R6);
         [PTBR + 2*ctr + 4] = R0;
         [PTBR + 2*ctr + 5] = "0110";
         ctr = ctr + 1;
@@ -51,7 +51,6 @@ endwhile;
 [PROCESS_TABLE + newPID*16 + 4] = CREATED;
 [PROCESS_TABLE + newPID*16 + 9] = 0;
 [PROCESS_TABLE + newPID*16 + 12] = 0; 
-
 ctr = 0;
 while(ctr<16) do
     [DISK_MAP_TABLE + newPID*10 + ctr] = [DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + ctr];
@@ -75,9 +74,8 @@ endwhile;
 
 [[PROCESS_TABLE + newPID*16 + 11]*512] = BP;
 [[PTBR + 2 * ([PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE + 1] + 13] - 1)/ 512] * 512 + ([PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE + 1] + 13] - 1) % 512] = newPID;
-[[PAGE_TABLE_BASE +newPID*20 + 2 * ([PROCESS_TABLE+newPID*16+13] - 1)/ 512] * 512 + ( [PROCESS_TABLE+newPID*16+13]- 1) % 512] = newPID;
+[[PAGE_TABLE_BASE +newPID*20 + 2 * ([PROCESS_TABLE+newPID*16+13] - 1)/ 512] * 512 + ( [PROCESS_TABLE+newPID*16+13]- 1) % 512] = 0;
 [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1 ]*16 + 9] = 0; //resetting the mode of Parent
-
 SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];
 ireturn;
 

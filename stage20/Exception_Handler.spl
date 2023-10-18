@@ -6,7 +6,6 @@ backup;
 multipush(EIP);
 if(EC!=0) then // if the cause of exception is not page fault or stack pointer is full - done
     print("Exception");
-    print(EC);
     multipush(R1);
     R1 = 3;
     R2 = [SYSTEM_STATUS_TABLE + 1];

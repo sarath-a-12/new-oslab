@@ -1,0 +1,28 @@
+[PROCESS_TABLE + ([SYSTEM_STATUS_TABLE+1] * 16) + 4] = TERMINATED;
+alias it R0;
+R0 = 1;
+alias flag R1;
+flag = 0;
+while(it<16) do
+	if([PROCESS_TABLE + (it*16) + 4] != TERMINATED) then
+		flag = 1;
+		break;
+	endif;
+	it = it+1;
+endwhile;
+if(flag == 1) then
+	call MOD_5;
+else
+	halt;
+endif;
+
+
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 10;
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13] = SP;
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 -1 ;
+R1 = 3;
+R2 = [SYSTEM_STATUS_TABLE + 1];
+call MOD_1;
+
+call MOD_5;
+ireturn;

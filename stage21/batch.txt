@@ -8,7 +8,7 @@ load --module 5 /home/sarath/Documents/sem5_labs/myexpos/stage21/MOD_5.xsm
 load --module 4 /home/sarath/Documents/sem5_labs/myexpos/stage21/MOD_4.xsm
 load --module 0 /home/sarath/Documents/sem5_labs/myexpos/stage21/MOD_0.xsm
 load --int=10 /home/sarath/Documents/sem5_labs/myexpos/stage21/INT_10.xsm
-load --int=11 /home/sarath/Documents/sem5_labs/myexpos/stage21/INT_10.xsm 
+load --int=11 /home/sarath/Documents/sem5_labs/myexpos/stage21/INT_11.xsm 
 load --int=15 /home/sarath/Documents/sem5_labs/myexpos/stage21/INT_15.xsm 
 load --library /home/sarath/Documents/myexpos/expl/library.lib
 load --int=7 /home/sarath/Documents/sem5_labs/myexpos/stage21/INT_7.xsm
@@ -24,3 +24,6 @@ load --exhandler /home/sarath/Documents/sem5_labs/myexpos/stage21/Exception_Hand
 load --exec /home/sarath/Documents/sem5_labs/myexpos/stage21/evenno.xsm
 load --exec /home/sarath/Documents/sem5_labs/myexpos/stage21/sll.xsm
 load --exec /home/sarath/Documents/sem5_labs/myexpos/stage21/bs.xsm
+load --exec /home/sarath/Documents/sem5_labs/myexpos/stage21/another.xsm
+load --exec /home/sarath/Documents/sem5_labs/myexpos/stage21/pid.xsm
+load --exec /home/sarath/Documents/sem5_labs/myexpos/stage21/printer.xsm

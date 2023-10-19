@@ -32,6 +32,7 @@ if(functionNumber == EXIT_PROCESS) then
 	//Exit process -- assume R2 contains the PID again
     if([PROCESS_TABLE + R2*16 + 9] != 9) then
         alias ctr R6;
+        ctr = 0;
         while(ctr<16) do
             if([PROCESS_TABLE + ctr*16 +4] == WAIT_PROCESS && [PROCESS_TABLE +ctr*16 +5] == R2) then
                 [PROCESS_TABLE + ctr*16 +4] = READY;
@@ -52,7 +53,7 @@ if(functionNumber == EXIT_PROCESS) then
 	// R2 is the same cause same PID again.
 	call MOD_1;
 	multipop(R1,R2);
-	[PROCESS_TABLE + [R2]*16 + 4] = TERMINATED;
+	[PROCESS_TABLE + (R2)*16 + 4] = TERMINATED;
 	return;
 endif;
 if(functionNumber == FREE_PAGE_TABLE ) then

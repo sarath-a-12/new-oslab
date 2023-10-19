@@ -3,9 +3,11 @@ decl
 enddecl
 int main(){
 	begin
+        temp = exposcall("Write",-2,"Enter N");
 		temp=exposcall("Read",-1,N);
 		num=0;
 		while(num<N) do 
+            temp = exposcall("Write",-2,"Enter number");
 			temp=exposcall("Read",-1,a[num]);
 			num=num+1;
 		endwhile;
@@ -23,7 +25,7 @@ int main(){
 			endwhile;
 			i=i+1;
 		endwhile;
-
+        temp = exposcall("Write",-2,"sorted list :");
 		i=0;
 		while(i<N) do 
 			temp=exposcall("Write",-2,a[i]);

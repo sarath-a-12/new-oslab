@@ -119,4 +119,11 @@ endwhile;
 [SYSTEM_STATUS_TABLE + 2] = 45; // initialising mem free pages
 
 [DISK_STATUS_TABLE] = 0; //free in the beginning
+
+counter = 0;
+while(counter<16) do
+    [[PROCESS_TABLE + 16 + 11]*512 + RESOURCE_TABLE_OFFSET + counter] = -1;
+    counter = counter + 2;
+endwhile;
+breakpoint;
 return;	

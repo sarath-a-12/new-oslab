@@ -51,6 +51,18 @@ endwhile;
 [PROCESS_TABLE + newPID*16 + 4] = CREATED;
 [PROCESS_TABLE + newPID*16 + 9] = 0;
 [PROCESS_TABLE + newPID*16 + 12] = 0; 
+
+
+ctr = 0;
+alias userAreaPageChild R7;
+userAreaPageChild = [PROCESS_TABLE + newPID*16 + 11]*512;
+alias userAreaPageParent R8;
+userAreaPageParent = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE]*16 + 11]*512;
+while(ctr<16) do
+    [userAreaPageChild + RESOURCE_TABLE_OFFSET + ctr] = [userAreaPageParent + RESOURCE_TABLE_OFFSET+ ctr];
+    ctr = ctr + 2;
+endwhile;
+
 ctr = 0;
 while(ctr<16) do
     [DISK_MAP_TABLE + newPID*10 + ctr] = [DISK_MAP_TABLE + [SYSTEM_STATUS_TABLE + 1]*10 + ctr];

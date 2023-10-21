@@ -125,5 +125,4 @@ while(counter<16) do
     [[PROCESS_TABLE + 16 + 11]*512 + RESOURCE_TABLE_OFFSET + counter] = -1;
     counter = counter + 2;
 endwhile;
-breakpoint;
 return;	

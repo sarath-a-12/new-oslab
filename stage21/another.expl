@@ -4,17 +4,9 @@ int main(){
     enddecl
     begin
         temp1 = exposcall("Fork");
-        if(temp1 > 0) then
-            temp4 = exposcall("Exec","pid.xsm");
-        endif;
         temp2 = exposcall("Fork");
-        if(temp2 > 0) then
-            temp4 = exposcall("Exec","pid.xsm");
-        endif;
         temp3 = exposcall("Fork");
-        if(temp3 > 0) then
-            temp4 = exposcall("Exec","pid.xsm");
-        endif;
+        temp4 = exposcall("Exec","pid.xsm");
         return 0;
     end
 }

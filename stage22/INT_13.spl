@@ -1,0 +1,72 @@
+alias userSP R4;
+userSP = SP;
+alias sysCallNumber R5;
+sysCallNumber = [[PTBR + ((userSP-5)/512)*2]*512 + (userSP-5)%512];
+print(sysCallNumber);
+
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13] = SP;
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 - 1;
+
+if(sysCallNumber = INT_SEMGET) then
+    [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = INT_SEMGET;
+    alias userAreaPage R6;
+    userAreaPage = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11];
+    alias ctr R7;
+    alias flag R8;
+    flag = 0;
+    while(ctr<16) do 
+        if([userAreaPage*512 + RESOURCE_TABLE_OFFSET + ctr] == -1) then
+            flag = 1;
+        endif;
+        ctr = ctr + 2;
+    endwhile;
+    if(flag == 0) then
+        [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512] = -1;
+        [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+        SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];
+        ireturn;
+    endif;
+    [userAreaPage*512 + RESOURCE_TABLE_OFFSET + ctr] = 1;
+    multipush(R4,R5,R6,R7,R8);
+    R1 = 6;
+    R2 = [SYSTEM_STATUS_TABLE + 1];
+    call MOD_0;
+    multipop(R4,R5,R6,R7,R8);
+    if(R0 == -1) then
+        [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512] = -2;
+        [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+        SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];
+        ireturn;
+    endif;
+    [userAreaPage*512 + RESOURCE_TABLE_OFFSET + ctr + 1] = R0;
+    [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512] = ctr/2;
+    [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+    SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];
+    ireturn;
+endif;
+
+if(sysCallNumber = INT_SEMRELEASE) then
+   [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = INT_SEMRELEASE; 
+   alias semDescriptor R6;
+   semDescriptor = [[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)%512];
+   alias userAreaPage R6;
+   userAreaPage = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11];
+   if(semDescriptor<0 || semDescriptor > 7 || [userAreaPage*512 + RESOURCE_TABLE_OFFSET + 2*semDescriptor] == -1) then//invalid semapphore condition missing
+      [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+      SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];
+      [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512] = -1; 
+  ireturn;
+ 
+   endif;
+   multipush(R6,R7);
+   R1 = 7;
+   R2 = semDescriptor;
+   R3 = [SYSTEM_STATUS_TABLE + 1];
+   call MOD_0;
+   multipop(R6,R7);
+   [userAreaPage*512 + RESOURCE_TABLE_OFFSET + 2*semDescriptor] = -1;
+   [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+   SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];
+   [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512] = 0; 
+  ireturn;
+endif;

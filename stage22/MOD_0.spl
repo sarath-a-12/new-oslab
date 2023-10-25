@@ -37,6 +37,28 @@ if(functionNum == RELEASE_TERMINAL) then
 		pID = pID + 1;
 	endwhile;
 	R0 = 0;
-	return;
-	
+	return;	
+endif;
+if(functionNum == ACQUIRE_SEMAPHORE) then
+    alias ctr R3;
+    ctr = 0;
+    while(ctr<32) do  
+        if([SEMAPHORE_TABLE + ctr*3 + 1] == 0) then
+            break;
+        endif;
+        ctr = ctr + 1;
+    endwhile;
+    if(ctr == 32) then
+        R0 = -1;
+        return;
+    endif;
+    [SEMAPHORE_TABLE + ctr*3 + 1] = 1;
+    [SEMAPHORE_TABLE + ctr*3 ] = -1;
+    R0 = ctr;
+    return;
+endif;
+if(functionNum == RELEASE_SEMAPHORE) then
+    alias R2 sem_table_index;
+    alias R3 currentPID;
+
 endif;

@@ -4,19 +4,19 @@
 SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 +11] * 512 - 1;
 backup;
 multipush(EIP);
-if(EC!=0) then // if the cause of exception is not page fault or stack pointer is full - done
+if(EC!=0) then // if the cause of exception is not page fault
     print("Exception");
     print(EC);
     multipush(R1);
     R1 = 3;
     R2 = [SYSTEM_STATUS_TABLE + 1];
-    call MOD_1;
+    call MOD_1; // Exit process function
     multipop(R1);
     multipush(R1,R2);
     call MOD_5;
     multipop(R1,R2);
 endif;
-if(SP == 5119) then // if the cause of exception is not page fault or stack pointer is full - done
+if(SP == 5119) then // if the cause of exception is that the stack pointer is full
     print("Stack overflow");
     multipush(R1);
     R1 = 3;
@@ -35,7 +35,7 @@ if(temp == 4 || temp == 5 || temp == 6 || temp == 7) then //issue due to code pa
     multipush(R1,R2,R3);
     R1 = 5;
     R2 = code_block_num;
-    call MOD_2;
+    call MOD_2; //Get code page 
     multipop(R1,R2,R3);
     [PTBR + 2*temp] = R0;
     [PTBR + 2*temp + 1] = "1100";
@@ -46,7 +46,7 @@ if(temp == 2 || temp ==3) then
     while(ctr<2) do 
         multipush(R1,R2,R3);
         R1 = 1;
-        call MOD_2;
+        call MOD_2; //get free page 
         [PTBR + 2*ctr + 4] = R0;
         [PTBR + 2*ctr +5] = "1110";
         multipop(R1,R2,R3);

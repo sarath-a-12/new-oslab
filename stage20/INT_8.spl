@@ -4,7 +4,7 @@
 SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512-1;
 
 R1 = 1;
-call MOD_1;
+call MOD_1; //get pcb entry 
 if(R0 == -1) then
     multipush(R0);
     [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1 ]*16 + 9] = 0;
@@ -14,7 +14,7 @@ endif;
 alias newPID R5;
 alias ctr R6;
 newPID = R0;
-if([PTBR + 4] == -1 || [PTBR + 6] == -1) then
+if([PTBR + 4] == -1 || [PTBR + 6] == -1) then //if heap pages are not allocated yet - allocate
     ctr = 0;
     while(ctr<2) do 
         multipush(R5,R6);
@@ -34,11 +34,12 @@ while(ctr<3) do
     multipop(R5,R6);
     if(ctr<2) then 
         [PAGE_TABLE_BASE + newPID*20 + 16 + 2*ctr] = R0;
-        [PAGE_TABLE_BASE + newPID*20 + 17 + 2*ctr] = "0110";
+        [PAGE_TABLE_BASE + newPID*20 + 17 + 2*ctr] = "0110"; //allocating two stack pages
+    else 
+        [PROCESS_TABLE + newPID*16 + 11] = R0; //allocating user pages 
     endif;
     ctr = ctr + 1;
 endwhile;
-[PROCESS_TABLE + newPID*16 + 11] = R0;
 ctr = 0;
 while(ctr<16) do
     if(ctr == 3 || ctr == 6 || ctr == 7 || ctr == 10 || ctr == 13) then

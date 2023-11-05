@@ -58,7 +58,20 @@ if(functionNum == ACQUIRE_SEMAPHORE) then
     return;
 endif;
 if(functionNum == RELEASE_SEMAPHORE) then
-    alias R2 sem_table_index;
-    alias R3 currentPID;
-
+    alias sem_table_index R2;
+    alias currentPID R3;
+    if([SEMAPHORE_TABLE + sem_table_index*3] == currentPID) then
+        [SEMAPHORE_TABLE + sem_table_index*3] = -1;
+        alias ctr R4;
+        ctr = 0;
+        while(ctr<16)  do
+            if([PROCESS_TABLE + ctr*16 + 4] == WAIT_SEMAPHORE && [PROCESS_TABLE + ctr*16 + 5] == sem_table_index ) then
+                [PROCESS_TABLE + ctr*16 + 4] = READY;
+            endif;
+            ctr = ctr + 1;
+        endwhile;
+    endif;
+    [SEMAPHORE_TABLE + sem_table_index*3 + 1] = [SEMAPHORE_TABLE + sem_table_index*3 + 1] -1 ;
+    return;
 endif;
+

@@ -7,7 +7,7 @@ print(sysCallNumber);
 [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13] = SP;
 SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 - 1;
 
-if(sysCallNumber = INT_SEMGET) then
+if(sysCallNumber == INT_SEMGET) then
     [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = INT_SEMGET;
     alias userAreaPage R6;
     userAreaPage = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11];
@@ -45,13 +45,13 @@ if(sysCallNumber = INT_SEMGET) then
     ireturn;
 endif;
 
-if(sysCallNumber = INT_SEMRELEASE) then
+if(sysCallNumber == INT_SEMRELEASE) then
    [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = INT_SEMRELEASE; 
    alias semDescriptor R6;
    semDescriptor = [[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)%512];
-   alias userAreaPage R6;
+   alias userAreaPage R7;
    userAreaPage = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11];
-   if(semDescriptor<0 || semDescriptor > 7 || [userAreaPage*512 + RESOURCE_TABLE_OFFSET + 2*semDescriptor] == -1) then//invalid semapphore condition missing
+   if(semDescriptor<0 || semDescriptor > 7 ||[userAreaPage*512 + RESOURCE_TABLE_OFFSET + 2*semDescriptor] == -1) then//invalid semapphore condition missing
       [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
       SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];
       [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512] = -1; 

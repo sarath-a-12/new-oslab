@@ -2,6 +2,7 @@ alias functionNumber R1;
 if(functionNumber == GET_PCB_ENTRY) then
     alias ctr R2;
     ctr = 0;
+    breakpoint;
     while(ctr<16) do
         if([PROCESS_TABLE + ctr*16 + 4]==TERMINATED) then
             break;

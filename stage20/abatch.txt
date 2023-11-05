@@ -2,7 +2,7 @@ fdisk
 load --os /home/sarath/Documents/sem5_labs/myexpos/stage20/os_startup.xsm
 load --int=timer /home/sarath/Documents/sem5_labs/myexpos/stage20/Timer_Interrupt.xsm
 load --idle /home/sarath/Documents/sem5_labs/myexpos/stage20/idle.xsm
-load --init /home/sarath/Documents/sem5_labs/myexpos/stage20/fork_2.xsm
+load --init /home/sarath/Documents/sem5_labs/myexpos/stage20/test.xsm
 load --module 7 /home/sarath/Documents/sem5_labs/myexpos/stage20/MOD_7.xsm
 load --module 5 /home/sarath/Documents/sem5_labs/myexpos/stage20/MOD_5.xsm
 load --module 4 /home/sarath/Documents/sem5_labs/myexpos/stage20/MOD_4.xsm

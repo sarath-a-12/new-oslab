@@ -1,4 +1,9 @@
 // =====================================================================================================================================
+loadi(12,25);	// int 5
+loadi(13,26);
+
+loadi(46,59);	// mod 3
+loadi(47,60);
 
 loadi(40,53);
 loadi(41,54); // loading mod 0 - terminal handling
@@ -180,4 +185,12 @@ while(counter<4) do
 endwhile;
 
 [PROCESS_TABLE+16+3]=ROOT; 
+
+counter=0;
+while(counter<MAX_OPENFILE_NUM) do
+	[OPEN_FILE_TABLE+counter*4]=-1;
+	[OPEN_FILE_TABLE+counter*4+1]=0;
+	counter=counter+1;
+endwhile;
+
 return;	

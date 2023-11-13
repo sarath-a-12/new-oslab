@@ -119,3 +119,39 @@ if(functionNum==RELEASE_INODE) then
 	R0=0;
 	return;
 endif;
+if(functionNum==ACQUIRE_BUFFER) then
+	alias buffNum R3;
+    alias pt_entry R7;
+    pt_entry=PROCESS_TABLE+[SYSTEM_STATUS_TABLE + 1]*16;
+	while([BUFFER_TABLE+4*buffNum+2]!=-1) do
+		[pt_entry+4]=WAIT_BUFFER;
+		[pt_entry+5]=buffNum;
+
+		call SCHEDULER;
+	endwhile;
+
+	[BUFFER_TABLE+4*buffNum+2]=currentPID;
+	return;
+endif;
+
+if(functionNum==RELEASE_BUFFER) then
+	alias buffNum R3;
+    alias pt_entry R7;
+    pt_entry=PROCESS_TABLE+[SYSTEM_STATUS_TABLE + 1]*16;
+	if([BUFFER_TABLE+4*buffNum+2]!=currentPID) then
+		R0=-1;
+		return;
+	endif;
+	[BUFFER_TABLE+4*buffNum+2]=-1;
+
+	alias cntr R4;
+	cntr=0;
+	while(cntr<MAX_PROC_NUM) do
+	 	if([pt_entry+4]==WAIT_BUFFER && [pt_entry+5]==buffNum) then
+			[pt_entry+4]=READY;
+		endif;
+		cntr=cntr+1;
+	endwhile;
+	R0=0;
+	return;
+endif;

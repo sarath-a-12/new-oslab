@@ -4,11 +4,10 @@ userSP = SP;
 [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13] = SP;
 SP =[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 - 1;
 alias fileDescriptor R1;
+alias retAddress R2;
+retAddress = [PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512;
 fileDescriptor = [[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)%512];
-if(fileDescriptor<0 || fileDescriptor>7)then
-	 [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512]= -1; //return value stored as -1
-else
-    if(fileDescriptor == -1) then
+ if(fileDescriptor == -1) then
 	    alias wordAddress R5;
 	    wordAddress =  [[PTBR + ((userSP-3)/512)*2]*512 + (userSP-3)%512];
 	    multipush(R0,R1,R2,R5);
@@ -17,11 +16,84 @@ else
 	    R3 = wordAddress;
 	    call MOD_4;
 	    multipop(R0,R1,R2,R5);
-	    [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512]= 0; //return value stored as 0
-    else
-        alia
-    endif;
+	    [retAddress] = 0; //return value stored as 0
+        [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+        SP = userSP;
+        ireturn;  
 endif;
+if(fileDescriptor<0 || fileDescriptor>7)then
+	 [retAddress]= -1; //return value stored as -1
+     [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+     SP = userSP;
+     ireturn;  
+else
+        alias userAreaPage R3;
+        alias oft R4; //open file table entry
+        alias inode_index R5;
+        alias lseek R6;
+        alias bufferAddress R7;
+        alias disk_block_num R8;
+        alias offset_val R9;
+        userAreaPage = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512;
+        bufferAddress = [PTBR + ((userSP-3)/512)*2]*512 + (userSP-3)%512;
+        if([userAreaPage + RESOURCE_TABLE_OFFSET + 2*fileDescriptor] != FILE) then
+            [retAddress] = -1;
+            [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+            SP = userSP;
+            ireturn;  
+        endif;   
+        oft = [userAreaPage + RESOURCE_TABLE_OFFSET + 2*fileDescriptor + 1];
+        inode_index = [OPEN_FILE_TABLE + 4*oft];
+        multipush(R0,R1,R2,R3,R4,R5,R6,R7);
+        R1 = 4; //acquiring inode
+        R2 = inode_index;
+        R3 = [SYSTEM_STATUS_TABLE + 1];
+        call MOD_0;
+        if(R0 == -1) then
+            [retAddress] = -1;
+            [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+            SP = userSP;
+            ireturn; 
+        endif;
+        multipop(R0,R1,R2,R3,R4,R5,R6,R7);
+        lseek = [OPEN_FILE_TABLE + 4*oft + 2];
+        bufferAddress = [PTBR + (bufferAddress/512)*2]*512 + bufferAddress%512;
+        print("buf");
+        print(bufferAddress);
+        if(inode_index == ROOT) then
+            if(lseek == 480 ) then
+                multipush(R0,R1,R2,R3,R4,R5,R6,R7);
+                R1 = RELEASE_INODE; //acquiring inode
+                R2 = inode_index;
+                R3 = [SYSTEM_STATUS_TABLE + 1];
+                call MOD_0;
+                multipop(R0,R1,R2,R3,R4,R5,R6,R7);   
+
+                 [retAddress] = -1;
+                 [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+                 SP = userSP;
+                 ireturn; 
+            else
+                disk_block_num = [INODE_TABLE + 16*inode_index + lseek/512];
+                offset_val = lseek%512;
+                multipush(R0,R1,R2,R3,R4,R5,R6,R7,R8,R9);
+                R1 = BUFFERED_READ;
+                R2 = disk_block_num;
+                R3 = offset_val;
+                R4 = bufferAddress;
+                call MOD_3;
+                multipop(R0,R1,R2,R3,R4,R5,R6,R7,R8,R9);
+                [OPEN_FILE_TABLE + oft*4 + 2] = [OPEN_FILE_TABLE + oft*4 + 2] + 1;
+            endif;
+        endif;
+        multipush(R0,R1,R2,R3,R4,R5,R6,R7,R8,R9);
+        R1 = RELEASE_INODE; //acquiring inode
+        R2 = inode_index;
+        R3 = [SYSTEM_STATUS_TABLE + 1];
+        call MOD_0;
+        multipop(R0,R1,R2,R3,R4,R5,R6,R7,R8,R9);   
+    endif;
+[retAddress] = 0;
 [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
 SP = userSP;
 ireturn;

@@ -1,0 +1,65 @@
+alias userSP R0;
+alias functionNum R1;
+alias retAddress R2;
+alias file R3;
+alias userSP R4;
+functionNum = [([PTBR + (2 * ((userSP - 5)/ 512))]* 512) + ((userSP - 5) % 512)];
+retAddress = ([PTBR + (2 * ((userSP - 1)/ 512))]* 512) + ((userSP - 1) % 512);
+file = [([PTBR + (2 * ((userSP - 4)/ 512))]* 512) + ((userSP - 4) % 512)];
+userSP = SP;
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13] = SP;
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512-1;
+
+if(functionNum == INT_OPEN) then
+    alias userAreaPage R5;
+    alias ctr R6;
+    [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = INT_OPEN; 
+    userAreaPage = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512;
+    ctr = 0;
+    while(ctr<8) do
+        if([userAreaPage + RESOURCE_TABLE_OFFSET + 2*ctr] == -1) then
+            break;
+        endif; 
+        ctr = ctr+1;
+    endwhile;
+    if(ctr == 8) then
+        SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];  
+        PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+        [retAddress] = -3;
+    endif;
+    multipush(R0,R1,R2,R3,R4,R5,R6);
+    R1 = 3;
+    R2 = file;
+    call MOD_3;
+    R7 = R0;
+    multipop(R0,R1,R2,R3,R4,R5,R6);
+    if(R7 == -1 || R7 == -2) then
+        SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];  
+        PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+        [retAddress] = R7;
+    endif;
+    [userAreaPage + RESOURCE_TABLE_OFFSET + 2*ctr] = FILE;
+    [userAreaPage + RESOURCE_TABLE_OFFSET + 2*ctr + 1] = R7;
+    [retAddress] = ctr;
+endif;
+
+if(functionNum == INT_CLOSE) then
+    alias userAreaPage R5;
+    userAreaPage = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512;
+    [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = INT_CLOSE;
+    if(file<0 || file>7 || [userAreaPage + RESOURCE_TABLE_OFFSET + 2*file] != 1) then
+       SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];  
+       PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+       [retAddress] = -1;
+    endif;
+    multipush(R0,R1,R2,R3,R4,R5);
+    R1 = 4;
+    R2 = [userAreaPage + RESOURCE_TABLE_OFFSET + 2*file + 1]; 
+    call MOD_3;
+    multipop(R0,R1,R2,R3,R4,R5);
+    [userAreaPage + RESOURCE_TABLE_OFFSET + 2*file] = -1; 
+    [retAddress] = 0;
+endif;
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];  
+PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+ireturn;

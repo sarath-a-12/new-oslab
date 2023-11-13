@@ -52,7 +52,6 @@ endwhile;
 [PROCESS_TABLE + newPID*16 + 9] = 0;
 [PROCESS_TABLE + newPID*16 + 12] = 0; 
 
-
 ctr = 0;
 alias userAreaPageChild R7;
 userAreaPageChild = [PROCESS_TABLE + newPID*16 + 11]*512;

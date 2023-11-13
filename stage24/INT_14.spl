@@ -1,0 +1,63 @@
+//Sem-lock - 19
+//Sem-unlock-20
+alias sys_call_number R5;
+alias semDescriptor R6;
+alias returnValueAddress  R7;
+alias semTableIndex R9;
+alias res_type R10;
+alias lockingPIDAddress R11;
+sys_call_number = [[PTBR + ((SP-5)/512)*2]*512 + (SP-5)%512];
+semDescriptor = [[PTBR + ((SP-4)/512)*2]*512 + (SP-4)%512];
+returnValueAddress = [PTBR + ((SP-1)/512)*2]*512 + (SP-1)%512;
+semTableIndex = [[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 + RESOURCE_TABLE_OFFSET + semDescriptor*2 + 1];
+res_type = [[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512 + RESOURCE_TABLE_OFFSET + semDescriptor*2];
+lockingPIDAddress = SEMAPHORE_TABLE + 4*semTableIndex;
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13] = SP;
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 +11]*512-1;
+if(sys_call_number == INT_SEMLOCK) then
+   [PROCESS_TABLE + [SYSTEM_STATUS_TABLE+1]*16 + 9] = INT_SEMLOCK;
+   if(semDescriptor<0 || semDescriptor>7 || res_type != 1) then//invalid check??
+        [returnValueAddress] = -1;
+        [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+        SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];
+        ireturn;
+    endif;
+    while(([lockingPIDAddress] != [SYSTEM_STATUS_TABLE + 1]) && [lockingPIDAddress] != -1) do
+        [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 4] = WAIT_SEMAPHORE;
+        [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 5] = semTableIndex;
+        multipush(R5,R6,R7,R9,R10,R11);
+        call MOD_5;
+        multipop(R5,R6,R7,R9,R10,R11);
+    endwhile;
+    [lockingPIDAddress] = [SYSTEM_STATUS_TABLE + 1];
+endif;
+if(sys_call_number == INT_SEMUNLOCK) then
+    [PROCESS_TABLE + [SYSTEM_STATUS_TABLE+1]*16 + 9] = INT_SEMUNLOCK;
+    if(semDescriptor<0 || semDescriptor>7 || res_type != 1) then//invalid check??
+        [returnValueAddress] = -1;
+        [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+        SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];
+        ireturn;
+    endif;
+    if([lockingPIDAddress] != -1) then
+        if([lockingPIDAddress] != [SYSTEM_STATUS_TABLE + 1]) then
+            [returnValueAddress] = -2;
+            [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+            SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];
+            ireturn;
+        endif;
+        [lockingPIDAddress] = -1;
+        alias ctr R8;
+        ctr = 0;
+        while(ctr<16) do
+            if([PROCESS_TABLE + ctr*16 + 4]==WAIT_SEMAPHORE && [PROCESS_TABLE + ctr*16 + 5] == semTableIndex) then
+                [PROCESS_TABLE + ctr*16 + 4] = READY;
+            endif;
+            ctr = ctr +1;
+        endwhile;
+     endif;
+endif;
+[returnValueAddress] = 0;
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];
+ireturn;

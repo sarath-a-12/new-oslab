@@ -6,7 +6,7 @@ SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 11]*512-1;
 R1 = 1;
 call MOD_1;
 if(R0 == -1) then
-    multipush(R0);
+    [[PTBR + 2 * ([PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE + 1] + 13] - 1)/ 512] * 512 + ([PROCESS_TABLE + 16*[SYSTEM_STATUS_TABLE + 1] + 13] - 1) % 512] = -1;
     [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1 ]*16 + 9] = 0;
     SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13]; 
     ireturn;
@@ -51,7 +51,6 @@ endwhile;
 [PROCESS_TABLE + newPID*16 + 4] = CREATED;
 [PROCESS_TABLE + newPID*16 + 9] = 0;
 [PROCESS_TABLE + newPID*16 + 12] = 0; 
-
 
 ctr = 0;
 alias userAreaPageChild R7;

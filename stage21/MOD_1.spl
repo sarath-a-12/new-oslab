@@ -23,7 +23,7 @@ if(functionNumber == FREE_USER_AREA_PAGE) then
 	//Free user area page corresponding number -- assume R2 contains the PID
 	multipush(R1,R2);
 	R1 = 2;
-	R2 = [PROCESS_TABLE + [R2]*16 + 11];
+	R2 = [PROCESS_TABLE + (R2)*16 + 11];
 	call MOD_2;
 	multipop(R1,R2);
 	return;
@@ -66,13 +66,15 @@ if(functionNumber == FREE_PAGE_TABLE ) then
 	//Now release all Pages using the Release Page
 	alias counter R3;
 	counter = 0;
-	while(counter<21) do
+	while(counter<19) do
 		if([PAGE_TABLE_BASE + (R2*20)+ counter] != -1) then
 			multipush(R0,R1,R2,R3);
 			R1 = 2;
 			R2 = [PAGE_TABLE_BASE + (R2*20) + counter];
 			call MOD_2;
 			multipop(R0,R1,R2,R3);
+           [PAGE_TABLE_BASE + (R2*20)+ counter] = -1;
+           [PAGE_TABLE_BASE + (R2*20)+ counter + 1] = "0000";
 		endif;
 		counter = counter + 2;
 	endwhile;

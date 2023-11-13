@@ -1,0 +1,33 @@
+fdisk
+load --os /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/os_startup.xsm
+load --int=timer /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/Timer_Interrupt.xsm
+load --idle /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/idle.xsm
+load --init /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/shell.xsm
+load --module 7 /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/MOD_7.xsm
+load --module 5 /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/MOD_5.xsm
+load --module 4 /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/MOD_4.xsm
+load --module 0 /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/MOD_0.xsm
+load --int=10 /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/INT_10.xsm
+load --int=11 /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/INT_11.xsm 
+load --int=15 /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/INT_15.xsm 
+load --int=13 /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/INT_13.xsm 
+load --int=14 /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/INT_14.xsm 
+load --library /home/sarath/Documents/myexpos/expl/library.lib
+load --int=7 /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/INT_7.xsm
+load --int=8 /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/INT_8.xsm
+load --int=6 /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/INT_6.xsm
+load --int=9 /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/INT_9.xsm
+load --module 1 /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/MOD_1.xsm
+load --module 2 /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/MOD_2.xsm
+load --int=console /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/Console_Interrupt.xsm
+load --exec /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/oddno.xsm
+load --int=disk /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/Disk_Interrupt.xsm
+load --exhandler /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/Exception_Handler.xsm
+load --exec /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/evenno.xsm
+load --exec /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/pid.xsm
+load --exec /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/another.xsm
+load --exec /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/sem_chi.xsm
+load --exec /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/sema_t.xsm
+load --exec /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/sem_par.xsm
+load --exec /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/merg1.xsm
+load --exec /home/sarath/Documents/sem5_labs/myexpos/stage22_temp/merg2.xsm

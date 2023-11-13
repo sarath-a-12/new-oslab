@@ -37,6 +37,5 @@ if(functionNum == RELEASE_TERMINAL) then
 		pID = pID + 1;
 	endwhile;
 	R0 = 0;
-	return;
-	
+	return;	
 endif;

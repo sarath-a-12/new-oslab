@@ -59,6 +59,12 @@ loadi(25,38); //loading INT_11
 loadi(32,45);
 loadi(33,46); //loading INT_15
 
+loadi(28,41);
+loadi(29,42); //loading INT_13
+
+loadi(30,43);
+loadi(31,44); //loading INT_14
+
 // INIT - CODE
 
 
@@ -142,6 +148,14 @@ counter = 0;
 while(counter<16) do
     [[PROCESS_TABLE + 16 + 11]*512 + RESOURCE_TABLE_OFFSET + counter] = -1;
     counter = counter + 2;
+endwhile;
+
+//initialising sem table
+counter = 0;
+while(counter<32) do
+    [SEMAPHORE_TABLE + counter*3 + 0] = -1; //locking pid set to -1
+    [SEMAPHORE_TABLE + counter*3 + 1] = 0; //process count initialised to 0 for all processes 
+    counter = counter + 1;
 endwhile;
 
 return;	

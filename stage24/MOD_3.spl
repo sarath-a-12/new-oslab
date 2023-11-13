@@ -1,0 +1,85 @@
+alias functionNum R1;
+if(functionNum == INT_OPEN) then
+    alias fileName R2;
+    alias ctr R3;
+    alias oft R4; //open file table
+    ctr = 0;
+    oft = 0;
+    while(ctr<MAX_FILE_NUM) do
+        if([INODE_TABLE + ctr*16 + 1] == fileName) then
+            break;
+        endif;
+        ctr = ctr + 1;
+    endwhile;
+    multipush(R1,R2,R3);
+    R1 = ACQUIRE_INODE;
+    R2 = ctr;
+    R3 = [SYSTEM_STATUS_TABLE + 1];
+    call MOD_0;
+    multipop(R1,R2,R3);
+    if(R0 == -1) then
+        return;
+    endif;
+    if([INODE_TABLE + ctr*16] == EXEC) then
+        multipush(R1,R2,R3);
+        R1 = RELEASE_INODE;
+        R2 = ctr;
+        R3 = [SYSTEM_STATUS_TABLE + 1];
+        call MOD_0;
+        multipop(R1,R2,R3);
+        R0 = -1;
+        return;
+    endif;
+    while(oft<MAX_OPENFILE_NUM) do
+        if([OPEN_FILE_TABLE + oft*4] == -1) then
+            break;
+        endif;
+        oft = oft + 1;
+    endwhile;
+    if(oft == MAX_FILE_NUM) then
+        multipush(R1,R2,R3);
+        R1 = RELEASE_INODE;
+        R2 = ctr;
+        R3 = [SYSTEM_STATUS_TABLE + 1];
+        call MOD_0;
+        multipop(R1,R2,R3);
+        R0 = -2;
+        return;
+    endif;
+    if(fileName == ROOT) then
+        [OPEN_FILE_TABLE + oft*4] = INODE_ROOT;
+    else
+        if([FILE_STATUS_TABLE + 1] == -1) then
+            [FILE_STATUS_TABLE + 1] = 1;
+        else
+            [FILE_STATUS_TABLE + 1] = [FILE_STATUS_TABLE] + 1;
+            [OPEN_FILE_TABLE + oft*4] =ctr;
+        endif;
+    endif;
+    [OPEN_FILE_TABLE + 1] = 1;
+    [OPEN_FILE_TABLE + 2] = 0;
+    multipush(R1,R2,R3);
+    R1 = RELEASE_INODE;
+    R2 = ctr;
+    R3 = [SYSTEM_STATUS_TABLE + 1];
+    call MOD_0;
+    multipop(R1,R2,R3);
+    R0 = oft;
+    return;
+endif;
+if(functionNum == INT_CLOSE) then
+    alias oft R2;
+    alias inode_index R3;
+    inode_index = [OPEN_FILE_TABLE + 4*oft];
+    [OPEN_FILE_TABLE + 4*oft + 1] = [OPEN_FILE_TABLE + 4*oft + 1]-1;
+    if([OPEN_FILE_TABLE + 4*oft + 1] == 0) then
+        [OPEN_FILE_TABLE + 4*oft] = -1;
+        [OPEN_FILE_TABLE + 4*oft + 1] = -1;
+        if([INODE_TABLE + inode_index*16] != ROOT) then
+            [FILE_STATUS_TABLE + 1] = [FILE_STATUS_TABLE + 1]-1;
+        endif;
+        if([FILE_STATUS_TABLE + 1] == 0) then
+            [FILE_STATUS_TABLE + 1] = -1;
+        endif;
+    endif;
+endif;

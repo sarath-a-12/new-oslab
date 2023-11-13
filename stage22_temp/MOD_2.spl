@@ -1,0 +1,78 @@
+alias functionNum R1;
+if(functionNum == GET_FREE_PAGE) then
+	[SYSTEM_STATUS_TABLE + 3] = [SYSTEM_STATUS_TABLE + 3] + 1; //Do not increment the WAIT_MEM_COUNT in busy loop (an important step ) ??
+	while([SYSTEM_STATUS_TABLE + 2] == 0) do 
+		[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 4] = WAIT_MEM; 
+		multipush(R1,R2);
+		call MOD_5; // blocking the process
+		multipop(R1,R2);
+	endwhile;
+	[SYSTEM_STATUS_TABLE + 2] = [SYSTEM_STATUS_TABLE + 2] - 1;
+	[SYSTEM_STATUS_TABLE + 3] = [SYSTEM_STATUS_TABLE + 3] - 1; 
+	alias counter R2;
+	counter = 83;
+	while(counter<129) do 
+		if([MEMORY_FREE_LIST + counter] == 0) then
+			[MEMORY_FREE_LIST + counter] = 1;
+			R0 = counter;
+			break;
+		endif;
+		counter = counter + 1;
+	endwhile;
+	return;
+endif;
+if(functionNum == RELEASE_PAGE) then
+	[MEMORY_FREE_LIST + R2] = [MEMORY_FREE_LIST + R2] - 1;
+	if([MEMORY_FREE_LIST + R2] == 0) then //page is free
+		[SYSTEM_STATUS_TABLE + 2] = [SYSTEM_STATUS_TABLE + 2] + 1;
+	endif;
+	alias counter R3;
+	counter = 1;
+	while(counter<16) do 
+		if([PROCESS_TABLE + counter*16 + 4] == WAIT_MEM) then 
+		    [PROCESS_TABLE + counter*16 + 4] = READY;
+		endif;
+		counter = counter + 1;
+	endwhile;
+	return;
+endif;
+if(functionNum == GET_CODE_PAGE) then
+    alias block_number R2;
+    alias PIDctr R3;
+    alias flag R5 ;
+    PIDctr = 0;
+    flag = 0;
+    while(PIDctr<16) do
+        alias ctr R4;
+        ctr = 4;
+        while(ctr<8) do 
+            if([DISK_MAP_TABLE + PIDctr*10 + ctr] == block_number && [PTBR + 2*ctr]!= -1) then
+                flag = 1;
+                R0 = [PTBR + 2*ctr];
+                [MEMORY_FREE_LIST + R0] = [MEMORY_FREE_LIST + R0] + 1;
+                break;
+            endif;
+            ctr = ctr + 1;
+        endwhile;
+        PIDctr = PIDctr + 1;
+    endwhile;
+    if(flag==0) then
+        multipush(R1,R2,R3,R4,R5);
+        R1 = 1;
+        call MOD_2;
+        multipop(R1,R2,R3,R4,R5);
+        multipush(R1,R2,R4,R5);
+        R4 = block_number;
+        R1 = 2;
+        R2 = [SYSTEM_STATUS_TABLE + 1];
+        R3 = R0;
+        call MOD_4;
+        multipop(R1,R2,R4,R5);
+        R0 = R3;
+    endif;
+    return;
+endif;
+if(functionNum == RELEASE_BLOCK) then
+    [DISK_FREE_LIST + R2] = 0;
+    return;
+endif;

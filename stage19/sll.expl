@@ -12,7 +12,7 @@ enddecl
     begin
         temp = exposcall("Write",-2,"Enter N");
         temp = exposcall("Read",-1,N);
-        temp = initialize();
+        temp = initialize(); 
         head = alloc();
         ptr = head;
         i = 0;

@@ -1,0 +1,183 @@
+// =====================================================================================================================================
+
+loadi(40,53);
+loadi(41,54); // loading mod 0 - terminal handling
+
+loadi(48,61);
+loadi(49,62); // loading mod 4 - device manager
+
+loadi(4,17);
+loadi(5,18); //for timer interrupt handler
+
+loadi(65,7);
+loadi(66,8); //Init code
+
+loadi(63,13);
+loadi(64,14); //Library.lib
+
+loadi(22,35);
+loadi(23,36); // int - 10
+
+loadi(2,15);
+loadi(3,16); //exception handler
+
+loadi(61,2); // loading disk_free_list 
+
+loadi(16,29);
+loadi(17,30);// INT - 7 loader
+
+loadi(59,3);
+loadi(60,4); //Inode table loading
+
+loadi(50,63); // Loading module 5 - scheduler
+loadi(51,64);
+
+loadi(8,21);
+loadi(9,22); // Console-Interrupt routine
+
+loadi(14,27);
+loadi(15,28); //Interrupt 6 
+
+loadi(20,33);
+loadi(21,34); // Interrupt 9
+
+loadi(42,55);
+loadi(43,56); // Loading MOD 1 - Process Manager
+
+loadi(44,57);
+loadi(45,58); // Loading MOD_2 - Memory Manager
+
+loadi(6,19);
+loadi(7,20); // Loading Disk Interrupt routine
+
+loadi(18,31);
+loadi(19,32); //loading FORK
+
+loadi(24,37);
+loadi(25,38); //loading INT_11
+
+loadi(32,45);
+loadi(33,46); //loading INT_15
+
+
+loadi(28,41);
+loadi(29,42); //loading INT_13
+
+loadi(30,43);
+loadi(31,44);//loading INT_14
+
+loadi(10,23);	// loading INT_4
+loadi(11,24);
+
+// INIT - CODE
+
+
+PTBR = PAGE_TABLE_BASE+20;
+PTLR = 10;
+
+//Shared Library
+[PTBR+0] = 63;
+[PTBR+1] = "0100";
+[PTBR+2] = 64;
+[PTBR+3] = "0100";
+
+//Heap
+[PTBR+4] = 78;
+[PTBR+5] = "0110";
+[PTBR+6] = 79;
+[PTBR+7] = "0110";
+
+//Code
+[PTBR+8] = 65;
+[PTBR+9] = "0100";
+[PTBR+10] = 66;
+[PTBR+11] = "0100";
+[PTBR+12] = -1;
+[PTBR+13] = "0000";
+[PTBR+14] = -1;
+[PTBR+15] = "0000";
+
+//Stack
+[PTBR+16] = 76;
+[PTBR+17] = "0110";
+[PTBR+18] = 77;
+[PTBR+19] = "0110";
+
+
+[PROCESS_TABLE+16+1] = 1;
+[PROCESS_TABLE +16+ 4] = CREATED;
+[PROCESS_TABLE + 16+11] = 80; //user area
+[PROCESS_TABLE + 16+13] = 8*512; //user stack pointers
+[PROCESS_TABLE + 16+12] = 0; //Kernel pointer
+[PROCESS_TABLE + 16+14] = PAGE_TABLE_BASE + 20;
+[PROCESS_TABLE + 16+15] = PTLR;
+
+[76*512] = [65*512+1];
+
+alias counter R0;
+counter = 2;
+
+while(counter <16) do
+	[PROCESS_TABLE +(16*counter)+ 4] = TERMINATED;
+	counter = counter + 1;
+endwhile;
+
+[TERMINAL_STATUS_TABLE] = 0;
+
+counter = 0;
+while(counter <83) do
+	[MEMORY_FREE_LIST + counter] = 1; //used by Kernel Process or other processes
+	counter = counter + 1;
+endwhile;
+while(counter <128) do 
+	[MEMORY_FREE_LIST + counter] = 0; //free memory pages
+	counter = counter + 1;
+endwhile;
+
+[SYSTEM_STATUS_TABLE + 3] = 0;
+[SYSTEM_STATUS_TABLE + 2] = 45; // initialising mem free pages
+
+[DISK_STATUS_TABLE] = 0; //free in the beginning
+
+[DISK_MAP_TABLE + 10 + 2] = 78;
+[DISK_MAP_TABLE + 10 + 3] = 79;
+[DISK_MAP_TABLE + 10 + 4] = 65;
+[DISK_MAP_TABLE + 10 + 5] = 66;
+[DISK_MAP_TABLE + 10 + 6] = -1;
+[DISK_MAP_TABLE + 10 + 7] = -1;
+[DISK_MAP_TABLE + 10 + 8] = 76;
+[DISK_MAP_TABLE + 10 + 9] = 77;
+
+counter = 0;
+while(counter<16) do
+    [[PROCESS_TABLE + 16 + 11]*512 + RESOURCE_TABLE_OFFSET + counter] = -1;
+    counter = counter + 2;
+endwhile;
+
+//initialising sem table
+counter = 0;
+while(counter<32) do
+    [SEMAPHORE_TABLE + counter*4 + 0] = -1; //locking pid set to -1
+    [SEMAPHORE_TABLE + counter*4 + 1] = 0; //process count initialised to 0 for all processes 
+    counter = counter + 1;
+endwhile;
+
+//initializing file status Table
+counter=0;
+while(counter<MAX_FILE_NUM) do
+	[FILE_STATUS_TABLE+counter*4]=-1;
+	[FILE_STATUS_TABLE+counter*4+1]=-1;
+	counter=counter+1;
+endwhile;
+
+//initializing BUFFER_TABLE
+counter=0;
+while(counter<4) do
+	[BUFFER_TABLE+counter*4]=-1;
+	[BUFFER_TABLE+counter*4+1]=0;
+	[BUFFER_TABLE+counter*4+2]=-1;
+	counter=counter+1;
+endwhile;
+
+[PROCESS_TABLE+16+3]=ROOT; 
+return;	

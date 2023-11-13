@@ -1,0 +1,48 @@
+alias userSP R7;
+userSP = SP;
+alias sys_call_number R5;
+sys_call_number = [[PTBR + ((userSP-5)/512)*2]*512 + (userSP-5)%512];
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13] = SP;
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 +11]*512-1;
+
+if(sys_call_number == INT_WAIT) then
+    [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = INT_WAIT;
+    alias waitPID R6;
+    waitPID = [[PTBR + ((userSP-4)/512)*2]*512 + (userSP-4)%512];
+    if(waitPID == [SYSTEM_STATUS_TABLE + 1] || [PROCESS_TABLE + waitPID*16 +4] == TERMINATED || waitPID<0 || waitPID>15) then
+        [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512] = -1;
+        [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+        SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];
+        ireturn;
+    endif;
+    [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 4] = WAIT_PROCESS;
+    [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 5] = waitPID;
+    multipush(R5,R6,R7);
+    call MOD_5;
+    multipop(R5,R6,R7);
+    [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512] = 0; //succesful return
+endif;
+
+if(sys_call_number == INT_SIGNAL) then
+    alias ctr R6;
+    [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = INT_SIGNAL;
+    while(ctr<16) do
+        if([PROCESS_TABLE + ctr*16 +4] == WAIT_PROCESS && [PROCESS_TABLE +ctr*16 +5] == [SYSTEM_STATUS_TABLE +1]) then
+            [PROCESS_TABLE + ctr*16 +4] = READY;
+        endif;
+        ctr = ctr + 1;
+    endwhile;
+    [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512] = 0; //succesful return
+endif;
+
+if(sys_call_number == INT_GETPID) then
+    [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512] = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 1]; 
+endif;
+
+if(sys_call_number == INT_GETPPID) then
+    [[PTBR + ((userSP-1)/512)*2]*512 + (userSP-1)%512] = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 2]; 
+endif;
+
+[PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 9] = 0;
+SP = [PROCESS_TABLE + [SYSTEM_STATUS_TABLE + 1]*16 + 13];
+ireturn;

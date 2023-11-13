@@ -1,0 +1,37 @@
+type
+node {
+    int val;
+    node next;
+}
+endtype
+int main(){
+decl
+    int i,v,N,temp;
+    node head,ptr;
+enddecl
+    begin
+        temp = exposcall("Write",-2,"Enter N");
+        temp = exposcall("Read",-1,N);
+        temp = initialize();
+        head = alloc();
+        ptr = head;
+        i = 0;
+        while(i<N) do 
+            temp = exposcall("Write",-2,"Enter number");
+            temp = exposcall("Read",-1,v);
+            ptr.val = v;
+            ptr.next = alloc();
+            ptr = ptr.next;
+            i = i+ 1;
+        endwhile;
+        i =0;
+        temp = exposcall("Write",-2,"Linkedlist:");
+        ptr = head;
+        while(i<N) do
+            temp = exposcall("Write",-2,ptr.val);
+            ptr = ptr.next;
+            i = i+1;
+        endwhile;
+        return 0;
+    end
+}
